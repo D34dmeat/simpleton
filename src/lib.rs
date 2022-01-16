@@ -2,6 +2,8 @@
 /// ## The simpletons tui
 /// 
 
+pub mod display;
+use display::*;
 
 
 
