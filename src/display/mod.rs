@@ -1,4 +1,7 @@
-use std::io::*;
+use std::{io::*};
+mod page;
+use page::{Page, Action, DefaultAction};
+
 
 /// Display struct
 pub struct Display{
@@ -38,26 +41,6 @@ pub trait Input {
 }
 
 
-type Action = Box<dyn Fn(&Display,Response)->Response>;
-
-pub struct Page{
-    title: String,
-    rows: Vec<String>,
-    action: Action
-}
-
-
-impl Page{
-    pub fn new(action:Action)->Self{
-        Page{title:String::new(),rows:Vec::new(),action}
-    }
-    pub fn new_with_title(title:&str,action:Action)->Self{
-        Page{title:String::from(title),rows:Vec::new(),action}
-    }
-    pub fn push(&mut self, value: String){
-        self.rows.push(value)
-    }
-}
 
 impl Input for Display{
     
@@ -99,6 +82,14 @@ impl Display{
             self.page_index = index;
         }
     }
+    pub fn get_page(&mut self, idx:usize)->&mut Page{
+            &mut self.page_buffer[idx]
+    }
+    pub fn add_page(&mut self, page:Page)->usize{
+        self.page_buffer.push(page);
+        self.page_buffer.len()-1
+    }
+
     pub fn back(&mut self){
         let i = self.page_index;
         if let Some(index) = self.back_index.pop(){
@@ -123,9 +114,10 @@ impl Display{
         
         let _re = std::io::stdout().flush();
         
-        //input.trim().parse().unwrap_or(201)
-        //let resp = Display::parse_input();
-        (self.page_buffer[self.page_index].action)(&self, self.parse_input())
+        match (self.page_buffer[self.page_index].action)(&self, self.parse_input()){
+            Response::Menu=>self.show_menu_page(),
+            x=>x
+        }
         
     }
     pub fn show_menu_page(&mut self)->Response{
@@ -146,7 +138,8 @@ impl Display{
         match (self.page_buffer[index].action)(&self, self.parse_input()){
             Response::Alt(x) => {
                 self.page_buffer.remove(index);
-                self.page_index = x;Response::Alt(x)},
+                Response::Page(x)},
+                //self.page_index = x;Response::Alt(x)},
             _=>{
                 self.page_buffer.remove(index);
                 Response::Back}
@@ -193,7 +186,7 @@ impl Display{
         page.push(format!("    {}: ", query));
         //page.push(format_line(Placement::Left, query, row_len));
         //self.last_index = self.page_index;
-        self.page_buffer.push(Page{title: title.to_string(),rows:page, action});
+        self.page_buffer.push(Page{title: title.to_string(),rows:page, width:self.width,action});
         self.page_buffer.len()-1
     }
     pub fn new_info_page(&mut self,title: &str, info: &[&str], query: &str, action: Action)->usize{
@@ -221,14 +214,15 @@ impl Display{
         page.push(format!("    {}: ", query));
         //page.push(format_line(Placement::Left, query, row_len));
         
-        self.page_buffer.push(Page{title: title.to_string(),rows:page, action});
+        self.page_buffer.push(Page{title: title.to_string(),rows:page, width:self.width, action});
         //self.last_index = self.page_index;
         self.page_index = self.page_buffer.len()-1;
         self.page_buffer.len()-1
     }
    
-    
 } 
+
+
 
 impl Default for Display {
     fn default() -> Self {
