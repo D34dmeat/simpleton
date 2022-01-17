@@ -1,5 +1,7 @@
 /// # Simpleton
-/// ## The simpletons tui
+/// The simpletons tui
+/// 
+/// A simple tui with no actual features
 /// 
 
 pub mod display;

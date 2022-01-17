@@ -81,6 +81,10 @@ impl Display{
         self.height = height;
     }
 
+    pub fn get_page_index(&self)->usize{
+        self.page_index
+    }
+
     pub fn build_menu_page(&mut self)->usize{
         let mut headers = self.page_buffer.iter().map(|page|(page.title.to_owned())).collect::<Vec<String>>().to_owned();
         let copy = headers.iter_mut().map(|f|f.as_str()).collect::<Vec<_>>();
