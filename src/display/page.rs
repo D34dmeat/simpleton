@@ -43,10 +43,10 @@ impl Page{
 
 impl Page{
     /// ### build page
-    /// is the start of the builder pattern
+    /// this is the start of the builder pattern
     /// ## Example
-    /// ```
-    /// use simpleton::display::Page;
+    /// ``` rust 
+    /// pub use simpleton::display::page::Page;
     /// 
     /// let my_page = Page::build_page("this is a title");
     /// 
@@ -143,7 +143,7 @@ fn format_line(place: Placement,text: &str, vertical: &char, row_len: usize)->St
 #[test]
 fn page_test() {
     
-    use crate::display::{Display,Result};
+    use crate::display::{Display};
     let mut disp = Display::default();
     let mut temp = Page::build_page("title");
     let mut page2 = Page::new(Action::default());
@@ -159,6 +159,6 @@ fn page_test() {
     let tempidx =disp.add_page(temp);
     
     disp.get_page(tempidx).set_qery("this is where it's at");
-    disp.show();
+    //disp.show();
 
 }

@@ -1,5 +1,5 @@
 use std::{io::*};
-mod page;
+pub mod page;
 use page::{Page, Action, DefaultAction};
 
 
@@ -105,14 +105,12 @@ impl Display{
         print!("\x1B[2J");
         std::process::Command::new("cmd")
         .args(&["/Q","/C", "cls"]).status().expect("failed to clear screen");
-        
-        
+ 
         let mut out = std::io::stdout();
         //out.write_all(b"\x1B[2J");
         let page = self.page_buffer[self.page_index].rows.iter().fold(String::from(""),|x,y|{x + y});
-        let _rez = out.write_all(page.as_bytes());
-        
-        let _re = std::io::stdout().flush();
+        let _ = out.write_all(page.as_bytes());        
+        let _ = std::io::stdout().flush();
         
         match (self.page_buffer[self.page_index].action)(&self, self.parse_input()){
             Response::Menu=>self.show_menu_page(),
@@ -130,9 +128,9 @@ impl Display{
         let mut out = std::io::stdout();
         
         let page = self.page_buffer[index].rows.iter().fold(String::from(""),|x,y|{x + y});
-        let _rez = out.write_all(page.as_bytes());
+        let _ = out.write_all(page.as_bytes());
         
-        let _re = std::io::stdout().flush();
+        let _ = std::io::stdout().flush();
         
         
         match (self.page_buffer[index].action)(&self, self.parse_input()){
@@ -272,8 +270,8 @@ fn name() {
         
     let mut my_display = Display::new();
 
-    let my_page = my_display.new_page("testing title", &["option 1", "option 2"], &["this is some info"], "query", Box::new(|disp,res|{res}));
-    let my_page2 = my_display.new_page("testing title2", &["option 1", "option 2", "option 3"], &["this is some info on the subject","in several lines"], "answer", Box::new(|disp,res|{res}));
+    let my_page = my_display.new_page("testing title", &["option 1", "option 2"], &["this is some info"], "query", Action::default());
+    let my_page2 = my_display.new_page("testing title2", &["option 1", "option 2", "option 3"], &["this is some info on the subject","in several lines"], "answer", Box::new(|_disp,res|{res}));
     
     /* match my_display.show() {
         Response::Page(x) => println!("Response Page is{} ",x),
