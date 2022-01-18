@@ -7,7 +7,7 @@ pub trait DefaultAction {
     /// Default action that just passes on the response
     /// ## Example
     /// ``` rust
-    /// # use simpleton::display::page::*
+    /// # use simpleton::display::page::*;
     /// // to get a default Action
     /// let my_action = Action::default();
     /// 

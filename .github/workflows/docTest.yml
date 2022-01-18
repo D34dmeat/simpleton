@@ -1,0 +1,15 @@
+name: docTest
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build Docs
+      run: cargo doc --verbose
+    - name: Run Doc tests
+      run: cargo test --doc --verbose
