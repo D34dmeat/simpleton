@@ -14,4 +14,4 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 
 [badges]
-github = { repository = "d34dmeat/workflows/simpleton"}
+github = { repository = "d34dmeat/simpleton"}

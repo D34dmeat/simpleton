@@ -1,7 +1,6 @@
 use super::{Display,Response};
 
 
-
 pub type Action = Box<dyn Fn(&Display,Response)->Response>;
 pub trait DefaultAction {
     /// Default action that just passes on the response
