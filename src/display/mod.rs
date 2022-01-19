@@ -1,7 +1,7 @@
 use std::{io::*};
 pub mod page;
 //mod macros;
-use page::{Page, Action, DefaultAction};
+pub use page::{Page, Action, DefaultAction};
 
 
 /// Display struct
