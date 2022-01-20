@@ -226,7 +226,8 @@ fn name() {
     
     let my_home_page = Page::build_page("home").set_page_info_from_slice(&["this is some info","on the home page"]);
     let home =disp.add_page(my_home_page);
-    /* loop{
+    loop{
+        break; //to avoid errors in testing
         match disp.show(){
             
             Response::Alt(x) => {let t = Page::build_page(&format!("this is page {}",x));disp.add_page(t);},
@@ -237,5 +238,5 @@ fn name() {
             Response::Commands(_) => todo!(),
             _=>(),
             }
-        };  */
+        }; 
 }

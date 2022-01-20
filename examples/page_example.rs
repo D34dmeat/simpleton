@@ -8,7 +8,7 @@ fn main(){
     let home = my_display.add_page(Page::new_with_title("This is the home page", Action::default()));
     build_pages( &mut my_display);
     loop {
-        
+        break; //to avoid errors in testing
         match my_display.show() {
             Response::Alt(x) => {let t = Page::build_page(&format!("this is page {}",x));my_display.add_page(t);},
             Response::Exit => break,
