@@ -21,7 +21,6 @@ impl DefaultAction for Action{}
 pub struct Page{
     style: Style,
     pub parts: Parts,
-    pub width: usize,
     pub action: Action
 }
 
@@ -43,10 +42,10 @@ impl std::ops::DerefMut for Page {
 
 impl Page{
     pub fn new(action:Action)->Self{
-        Page{style:Style::default(),parts:Parts::new(90,120,""), width:90, action}
+        Page{style:Style::default(),parts:Parts::new(90,15,""), action}
     }
     pub fn new_with_title(title:&str,action:Action)->Self{
-        Page{style:Style::default(), parts:Parts::new_with_title(title,90,120,""), width:90, action}
+        Page{style:Style::default(), parts:Parts::new_with_title(title,90,15,""), action}
     }
     /* pub fn push(&mut self, value: String){
         self.rows.push(value)
@@ -69,7 +68,7 @@ impl Page{
         &self.style
     }
 
-    pub(crate) fn get_title(&self) -> String {
+    pub fn get_title(&self) -> String {
         self.parts.title.content.to_owned()
     }
 
@@ -82,26 +81,31 @@ impl Page{
     pub fn set_width(&mut self, width: usize) {
         self.parts.width = width;
     }
+
+    pub fn set_height(&mut self, height: usize) {
+        self.height = height;
+        self.parts.height = height;
+    }
 }
 
 impl Page{
-    pub fn new_page(title: &str, options: &[&str], info: &[&str],query: &str, action: Action)->Self{
-        let mut parts = Parts::new(90,120,"");
+    pub fn new_page(title: &str, options: &[&str], info: &[&str],query: &str, width:usize, height:usize, action: Action)->Self{
+        let mut parts = Parts::new(width,height,"");
         parts.set_title(title);
         parts.set_info(info);
         parts.set_options(options);
         parts.set_query(query);
-        Page { style: Style::default(), parts: parts, width: 90, action: action }
+        Page { style: Style::default(), parts: parts, action: action }
     }
 
-    fn build_parts(title:&str)->Self{
-        let mut parts = Parts::new(90,120,"");
+    fn build_parts(title:&str, width:usize, height:usize)->Self{
+        let mut parts = Parts::new(width,height,"");
         parts.set_title(title);
         parts.set_info(&[]);
         parts.set_options(&[]);
         parts.set_query("");
 
-        Page{ style:Style::Default,  parts, width: 90, action: Action::default() }
+        Page{ style:Style::Default,  parts, action: Action::default() }
     }
     /// ### build page
     /// this is the start of the builder pattern
@@ -112,8 +116,8 @@ impl Page{
     /// let my_page = Page::build_page("this is a title");
     /// 
     /// ```
-    pub fn build_page(title:&str)->Self{
-        Page::build_parts(title)
+    pub fn build_page(title:&str, width: usize, height: usize)->Self{
+        Page::build_parts(title,width, height)
         //Page{ title:title.to_string(), rows: Vec::new(), parts:Parts::new(), width: 90, action: Action::default() }
     }
 
@@ -245,10 +249,22 @@ impl Parts{
         /* if self.info(&Placement::Center, style, width).len() + self.options(&Placement::Center, style, width).len() < 5 {
             page.extend([" ";5].into_iter().map(|a|a.to_owned()));
         } */
+        for _ in 1..self.calculate_spacers() {
+            page.push(" ".format(&Placement::Center, style, width));
+        }
         page.extend(self.help(&Placement::Left,style, width).into_iter());
         page.push(self.query(&Placement::Left,style, width));
         
         page
+    }
+
+    fn calculate_spacers(&self)->usize{
+        let i= self.info.content.len();
+        let o= self.options.content.len();
+        match i+o<self.height-4 {
+            true => (self.height-4)-(i+o),
+            false => 0,
+        }
     }
 
     /// Get a formatted output of the parts's title.
@@ -367,6 +383,14 @@ impl LineFormat for Line{
         //self.content
     }
 }
+impl LineFormat for &str{
+    
+
+    fn format(&self,placement: &Placement,style: &Style,width:usize)->String {
+        Line{content:self.to_string()}.format(placement, style, width)
+    }
+type Content = String;
+}
 
 struct Title{content:String}
 impl  LineFormat for Title {
@@ -467,7 +491,7 @@ fn page_test() {
     
     use crate::display::{Display};
     let mut disp = Display::default();
-    let mut temp = Page::build_page("title");
+    let mut temp = Page::build_page("title",90,20);
     let mut page2 = Page::new(Action::default());
     //page2.unformatted_content("this is some \n un formatted content\n\n\n what do you think?");
     //temp.format_page(Style::Custom('*','*'), &[], &["some info"], "query", Action::default());
@@ -490,8 +514,8 @@ fn parts_test(){
     let mut disp = Display::default();
     //let mut temp = Page::new(Action::default());
     //temp.parts.set_title("my little title".to_string());
-    let mut temp = Page::build_page("hello")
-                                    .set_page_info_from_str("some random info");;//.set_page_width(60);
+    let mut temp = Page::build_page("hello",disp.width,disp.height)
+                                    .set_page_info_from_str("some random info");
     temp.set_options(&["some random options"]);
     
     let home = disp.add_page(temp);
