@@ -1,30 +1,25 @@
 extern crate simpleton;
-use simpleton::display::{Display, Response};
+use crate::simpleton::display::DefaultAction;
+use simpleton::display::{Display, Response, Page, Action};
 
 
 fn main(){
     let mut my_display = Display::new();
-
+    let home = my_display.add_page(Page::new_with_title("This is the home page", Action::default()));
     build_pages( &mut my_display);
     loop {
         
         match my_display.show() {
-            Response::Page(x) => my_display.set_page(x),
-            Response::Alt(x) => {println!("Response Alt is {} from page {} ",x, my_display.get_page_index());break},
+            Response::Alt(x) => {let t = Page::build_page(&format!("this is page {}",x));my_display.add_page(t);},
             Response::Exit => break,
-            Response::Back => (),
-            Response::New(_, _, _, _, _) => todo!(),
-            Response::NewInfo(_, _, _, _) => todo!(),
-            Response::Home => (),
+            Response::Back => my_display.back(),
+            Response::Page(x)=>my_display.set_page(x),
+            Response::Home => my_display.set_page(home),
             Response::Commands(x) if x[0] == "Page" => if let Ok(num) = x[1].parse::<usize>(){my_display.set_page(num)},
             Response::Commands(x) => {println!("commands {:?}",x);break},
-            Response::Menu => {
-                let res = my_display.show_menu_page();()
-    
-                
-            },
+            _=>(),
         }
-    }
+    }    
     
 }
 

@@ -20,6 +20,6 @@ mod tests {
         let mut my_display = Display::default();
         let my_page_index = my_display.add_page(my_page);
                 
-        assert_eq!(my_display.get_page(my_page_index).title, "hello".to_string());
+        assert_eq!(my_display.get_page(my_page_index).get_title(), "hello".to_string());
     }
 }

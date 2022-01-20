@@ -11,7 +11,7 @@ extern crate simpleton;
 use simpleton::*;
 
 fn main(){
-    let mod my_display = Display::new();
+    let mod disp = Display::new();
     let mod first_page = Page::build_page("Title")
                             .set_action(Box::new(move|display,response|{
                                 match response {
@@ -20,13 +20,18 @@ fn main(){
                                 }
                             }));
 
-    let first_page_index = my_display.add_page(first_page);
+    let first_page_index = disp.add_page(first_page);
 
     loop {
-        match my_display.show() {
+        match disp.show(){
+                                         //adding more pages dynamically
+            Response::Alt(x) => {let t = Page::build_page(&format!("this is page {}",x));disp.add_page(t);},
             Response::Exit => break,
-            _=>()
-        }
+            Response::Back => disp.back(),
+            Response::Page(x)=>disp.set_page(x),
+            Response::Home => disp.set_page(home),
+            Response::Commands(_) => todo!(),
+            _=>(),
     }
 }
 
