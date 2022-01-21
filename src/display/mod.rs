@@ -75,8 +75,8 @@ impl Display{
         self.page_index
     }
 
-    pub fn build_menu_page(&mut self)->usize{
-        let mut headers = self.page_buffer.iter().map(|page|(page.get_title().to_owned())).collect::<Vec<String>>().to_owned();
+    fn build_menu_page(&mut self)->usize{
+        let mut headers = self.page_buffer.iter().map(|page|(page.get_title())).collect::<Vec<String>>();
         let copy = headers.iter_mut().map(|f|f.as_str()).collect::<Vec<_>>();
         
         self.new_page("Page Menu", copy.as_slice(), &["info"], "Go to page", Box::new(move |_,res|{res}) )
@@ -119,7 +119,7 @@ impl Display{
         let _ = out.write_all(page.as_bytes());        
         let _ = std::io::stdout().flush();
         
-        match (self.page_buffer[self.page_index].action)(&self, self.parse_input()){
+        match (self.page_buffer[self.page_index].action)(self, self.parse_input()){
             Response::Menu=>self.show_menu_page(),
             x=>x
         }
@@ -140,7 +140,7 @@ impl Display{
         let _ = std::io::stdout().flush();
         
         
-        match (self.page_buffer[index].action)(&self, self.parse_input()){
+        match (self.page_buffer[index].action)(self, self.parse_input()){
             Response::Alt(x) => {
                 self.page_buffer.remove(index);
                 self.set_page(x);
@@ -227,7 +227,7 @@ fn name() {
     let my_page = disp.new_page("testing title", &["option 1", "option 2"], &["this is some info"], "query", Action::default());
     let my_page2 = disp.new_page("testing title2", &["option 1", "option 2", "option 3"], &["this is some info on the subject","in several lines"], "answer", Box::new(|_disp,res|{res}));
     
-    let mut my_home_page = Page::build_page("home",disp.width,disp.height).set_page_info_from_slice(&["this is some info","on the home page"]);
+    let mut my_home_page = Page::build_page(&disp,"home").set_page_info_from_slice(&["this is some info","on the home page"]);
     my_home_page.set_help("this is wome friendly help text, press q to quit, m for menu");
     my_home_page.set_query("what do you want to do?:");
     my_home_page.set_height(25);

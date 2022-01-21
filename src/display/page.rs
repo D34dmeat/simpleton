@@ -113,12 +113,15 @@ impl Page{
     /// ``` rust ignore
     /// pub use simpleton::display::page::Page;
     /// 
-    /// let my_page = Page::build_page("this is a title");
+    /// let (width,height) = (90,20);
+    /// let my_page = Page::build_page("this is a title",width, height);
     /// 
     /// ```
-    pub fn build_page(title:&str, width: usize, height: usize)->Self{
+        pub fn build_page(display: &Display,title:&str)->Self{
+        Page::build_parts(title,display.width, display.height)
+    }
+    pub fn build_page_(title:&str, width: usize, height: usize)->Self{
         Page::build_parts(title,width, height)
-        //Page{ title:title.to_string(), rows: Vec::new(), parts:Parts::new(), width: 90, action: Action::default() }
     }
 
     pub fn set_action(mut self, action:Action)->Self{
@@ -185,7 +188,7 @@ fn spacer(len:usize)->String{
     .chars().take(len).collect::<String>()
 }
 fn horizontal_line(style: &Style,width: usize)->String{
-    let (horizontal, vertical) = style.get_parts();
+    let (horizontal, _vertical) = style.get_parts();
     let mut buf = String::new();
         for _ in 0..width+1{buf.push(horizontal);}
         buf.push_str("\n");
@@ -207,7 +210,7 @@ impl Parts{
     
 
     /// Get a formated vector of options.
-    fn options(&self,placement: &Placement,style: &Style,width:usize) -> Vec<String> {
+    fn options(&self,placement: &Placement,style: &Style) -> Vec<String> {
         self.options.format(placement,style,self.width)
     }
 
@@ -216,7 +219,7 @@ impl Parts{
         self.options.add( options);//options.iter().map(|f|f.to_owned().to_string()).collect::<Vec<String>>()
     }
     /// Get a formatted string of the parts's query.
-    fn query(&self,placement: &Placement,style: &Style,width:usize) -> String {
+    fn query(&self,placement: &Placement,style: &Style) -> String {
         self.query.format(placement,style,self.width)
     }
     /// Get a reference to the parts's query.
@@ -230,7 +233,7 @@ impl Parts{
     }
 
     /// Get a formated section of the parts's info.
-    fn info(&self,placement: &Placement,style: &Style,width:usize) -> Vec<String> {
+    fn info(&self,placement: &Placement,style: &Style) -> Vec<String> {
         self.info.format(placement,style,self.width)
     }
 
@@ -243,17 +246,15 @@ impl Parts{
     fn get(&self, style: &Style, width: usize)->Vec<String>{
         let mut page = Vec::new();
         
-        page.extend(self.title(&Placement::Center,style, width).into_iter());
-        page.extend(self.info(&Placement::Center,style, width).into_iter());
-        page.extend(self.options(&Placement::Left,style, width).into_iter());
-        /* if self.info(&Placement::Center, style, width).len() + self.options(&Placement::Center, style, width).len() < 5 {
-            page.extend([" ";5].into_iter().map(|a|a.to_owned()));
-        } */
+        page.extend(self.title(&Placement::Center,style).into_iter());
+        page.extend(self.info(&Placement::Center,style).into_iter());
+        page.extend(self.options(&Placement::Left,style).into_iter());
+        
         for _ in 1..self.calculate_spacers() {
             page.push(" ".format(&Placement::Center, style, width));
         }
-        page.extend(self.help(&Placement::Left,style, width).into_iter());
-        page.push(self.query(&Placement::Left,style, width));
+        page.extend(self.help(&Placement::Left,style).into_iter());
+        page.push(self.query(&Placement::Left,style));
         
         page
     }
@@ -268,7 +269,7 @@ impl Parts{
     }
 
     /// Get a formatted output of the parts's title.
-    fn title(&self,placement: &Placement, style: &Style, width: usize) -> Vec<String> {
+    fn title(&self,placement: &Placement, style: &Style) -> Vec<String> {
         let mut title = Vec::new();
         title.push(horizontal_line(style,self.width));
         title.push(self.title.format(placement, style, self.width));
@@ -298,9 +299,10 @@ impl Parts{
             info: Info { content: vec![] }, 
             options: Options::new(), 
             query: Query("".to_owned()),
-            width: width,
-            height:height,
-            help: Info{content:vec![Line::new(help)]} , }
+            width,
+            height,
+            help: help.into(),//: Info::new(help) , 
+        }
     }
 
     /// Get a reference to the parts's width.
@@ -324,7 +326,7 @@ impl Parts{
     }
 
     /// Get a formatted output of the parts's help.
-    pub fn help(&self,placement: &Placement, style: &Style, width: usize) -> Vec<String> {
+    pub fn help(&self,placement: &Placement, style: &Style) -> Vec<String> {
         self.help.format(placement, style, self.width)
     }
 }
@@ -428,9 +430,7 @@ impl  LineFormat for Query {
             Placement::Right=>width.saturating_sub(width/6)
         };
         let (_,vertical) = style.get_parts();
-        let mut line =format!("{}{}{}: ",vertical,spacer(offset/3),self.0);
-        //line.push_str(&format!("{}{}\n",spacer(width-line.char_indices().count()),vertical)); 
-        line
+        format!("{}{}{}: ",vertical,spacer(offset/3),self.0)        
     }    
     
 
@@ -477,6 +477,7 @@ impl Options {
         self.content.extend(content.into_iter().enumerate().map(|(i,f)| Line::new( &format!("{} {}",i,f))));
     }
 }
+
 impl Query {
 
 
@@ -491,7 +492,7 @@ fn page_test() {
     
     use crate::display::{Display};
     let mut disp = Display::default();
-    let mut temp = Page::build_page("title",90,20);
+    let mut temp = Page::build_page(&disp,"title");
     let mut page2 = Page::new(Action::default());
     //page2.unformatted_content("this is some \n un formatted content\n\n\n what do you think?");
     //temp.format_page(Style::Custom('*','*'), &[], &["some info"], "query", Action::default());
@@ -514,7 +515,7 @@ fn parts_test(){
     let mut disp = Display::default();
     //let mut temp = Page::new(Action::default());
     //temp.parts.set_title("my little title".to_string());
-    let mut temp = Page::build_page("hello",disp.width,disp.height)
+    let mut temp = Page::build_page(&disp, "hello")
                                     .set_page_info_from_str("some random info");
     temp.set_options(&["some random options"]);
     

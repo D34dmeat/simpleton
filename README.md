@@ -12,7 +12,7 @@ use simpleton::*;
 
 fn main(){
     let mod disp = Display::new();
-    let mod first_page = Page::build_page("Title")
+    let mod first_page = Page::build_page(&disp, "Title")
                             .set_action(Box::new(move|display,response|{
                                 match response {
                                     Response::Alt(num) => {Response::page(num)},
@@ -20,12 +20,12 @@ fn main(){
                                 }
                             }));
 
-    let first_page_index = disp.add_page(first_page);
+    let home = disp.add_page(first_page);
 
     loop {
         match disp.show(){
                                          //adding more pages dynamically
-            Response::Alt(x) => {let t = Page::build_page(&format!("this is page {}",x));disp.add_page(t);},
+            Response::Alt(x) => {let t = Page::build_page(&disp, &format!("this is page {}",x));disp.add_page(t);},
             Response::Exit => break,
             Response::Back => disp.back(),
             Response::Page(x)=>disp.set_page(x),
