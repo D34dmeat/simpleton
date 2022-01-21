@@ -10,8 +10,8 @@ pub struct Display{
     last_index: usize,
     back_index: Vec<usize>,
     pub page_buffer: Vec<Page>,
-    width: usize,
-    height: usize
+    pub width: usize,
+    pub height: usize
 }
 
 pub trait Input {
