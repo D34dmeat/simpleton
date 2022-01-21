@@ -357,11 +357,11 @@ trait LineFormat{
 struct Line{
     content: String
 }
-
+#[allow(dead_code)]
 impl Line {
-    fn new(content:&str)->Self{Line{content:content.to_string()}}
-    fn set(&mut self, content:String){
-        self.content=content;
+    fn new(content:&str)->Self{content.into()}
+    fn set(&mut self, content:&str){
+        self.content=content.into();
     }
 }
 impl From<&str> for Line {
@@ -444,7 +444,7 @@ impl From<&str> for Info {
 }
 impl From<&[&str]> for Info {
     fn from(x: &[&str]) -> Self {
-        Info{ content: x.into_iter().map(|f| -> Line {f.to_owned().into()}).collect() }
+        Info{ content: x.iter().map(|f| -> Line {f.to_owned().into()}).collect() }
     }
 }
 impl Info {
@@ -462,7 +462,7 @@ impl Info {
 
 impl From<&[&str]> for Options {
     fn from(x: &[&str]) -> Self {
-        Options{ content: x.into_iter().enumerate().map(|(i,f)| -> Line {format!("{} {}",i,f).as_str().into()}).collect() }
+        Options{ content: x.iter().enumerate().map(|(i,f)| -> Line {format!("{} {}",i,f).as_str().into()}).collect() }
     }
 }
 impl Options {
@@ -474,16 +474,14 @@ impl Options {
         self.content.iter().map(|s| {s.format(placement, style, width)}).collect::<Vec<_>>()
     }
     fn add(&mut self, content: &[&str]){
-        self.content.extend(content.into_iter().enumerate().map(|(i,f)| Line::new( &format!("{} {}",i,f))));
+        self.content.extend(content.iter().enumerate().map(|(i,f)| Line::new( &format!("{} {}",i,f))));
     }
 }
-
+#[allow(dead_code)]
 impl Query {
-
-
-fn get(&self) -> &str {
-    self.0.as_ref()
-}
+    fn get(&self) -> &str {
+        self.0.as_ref()
+    }
 }
 
 
