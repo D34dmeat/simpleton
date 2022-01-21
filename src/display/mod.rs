@@ -231,8 +231,8 @@ fn name() {
     my_home_page.set_query("what do you want to do?:");
     my_home_page.set_height(25);
     let home =disp.add_page(my_home_page);
-    loop{
-        break; //to avoid errors in testing
+    /* loop{
+        
         match disp.show(){
             
             Response::Alt(x) => {let t = Page::build_page(&format!("this is page {}",x),disp.width,disp.height);disp.add_page(t);},
@@ -243,5 +243,5 @@ fn name() {
             Response::Commands(_) => todo!(),
             _=>(),
             }
-        }; 
+        };  */
 }
