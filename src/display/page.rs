@@ -110,7 +110,7 @@ impl Page{
     /// ### build page
     /// this is the start of the builder pattern
     /// ## Example
-    /// ``` rust 
+    /// ``` rust ignore
     /// pub use simpleton::display::page::Page;
     /// 
     /// let my_page = Page::build_page("this is a title");

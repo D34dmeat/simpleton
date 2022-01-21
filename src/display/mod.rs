@@ -192,8 +192,8 @@ impl Default for Display {
 ///     
 /// if the user response is a numeric it will send ` Response::Alt(num) `
 /// 
-///     the menu response is also handled internally and will create and
-///     show a page index page and also handle any numeric response from that page
+/// the menu response is also handled internally and will create and
+/// show a page index page and also handle any numeric response from that page
 /// ### Example
 /// ```rust ignore
 /// //handle in a match statement
@@ -203,6 +203,7 @@ impl Default for Display {
 ///     _=>()
 /// }
 /// ```
+/// 
 pub enum Response{
     Page(usize),
     Alt(usize),
