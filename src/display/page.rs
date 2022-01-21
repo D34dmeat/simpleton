@@ -205,7 +205,7 @@ pub struct Parts {
     help: Info
 }
 
-
+#[allow(dead_code)]
 impl Parts{
     
 
@@ -270,12 +270,17 @@ impl Parts{
 
     /// Get a formatted output of the parts's title.
     fn title(&self,placement: &Placement, style: &Style) -> Vec<String> {
-        let mut title = Vec::new();
+        /* let mut title = Vec::new();
         title.push(horizontal_line(style,self.width));
         title.push(self.title.format(placement, style, self.width));
         title.push(horizontal_line(style,self.width));
 
-        title
+        title */
+        vec![
+            horizontal_line(style,self.width),
+            self.title.format(placement, style, self.width),
+            horizontal_line(style,self.width)
+            ]
     }
 
     /// Set the parts's title.
@@ -359,7 +364,7 @@ struct Line{
 }
 #[allow(dead_code)]
 impl Line {
-    fn new(content:&str)->Self{content.into()}
+    fn new(content:&str)->Self{Line{content:content.to_string()}}
     fn set(&mut self, content:&str){
         self.content=content.into();
     }
