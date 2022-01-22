@@ -1,14 +1,14 @@
 extern crate simpleton;
-use crate::simpleton::display::DefaultAction;
-use simpleton::display::{Display, Response, Page, Action};
-
+//use crate::simpleton::display::DefaultAction;
+//use simpleton::display::{Display, Response, Page, Action};
+use simpleton::*;
 
 fn main(){
     let mut my_display = Display::new();
     let home = my_display.add_page(Page::new_with_title("This is the home page", Action::default()));
     build_pages( &mut my_display);
     loop {
-        break; //to avoid errors in testing
+       // break; //to avoid errors in testing
         match my_display.show() {
             Response::Alt(x) => {let t = Page::build_page(&my_display, &format!("this is page {}",x));my_display.add_page(t);},
             Response::Exit => break,
