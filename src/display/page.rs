@@ -1,5 +1,7 @@
 
 
+use std::ops::Add;
+
 use super::{Display,Response};
 
 
@@ -47,9 +49,10 @@ impl Page{
     pub fn new_with_title(title:&str,action:Action)->Self{
         Page{style:Style::default(), parts:Parts::new_with_title(title,90,15,""), action}
     }
-    /* pub fn push(&mut self, value: String){
-        self.rows.push(value)
-    } */
+    pub fn with_title(mut self, title: &str)->Page{
+        self.set_title(title);
+        self
+    }
     pub fn set_qery(&mut self, query: &str){
         self.parts.set_query(query);
         
@@ -150,6 +153,7 @@ impl Page{
 }
 
 
+#[derive(std::cmp::PartialEq)]
 pub enum Style{
     None,
     Default,
@@ -183,9 +187,13 @@ impl Style {
         (horizontal, vertical)
     }
 }
+/* fn spacer(len:usize)->String{
+   [' ';256].into_iter().take(len).collect::<String>()
+} */
+/// get a string of blanks of specified length
 fn spacer(len:usize)->String{
-    "                                                                                                        "
-    .chars().take(len).collect::<String>()
+    
+    (0..len).map(|_|' ').collect()
 }
 fn horizontal_line(style: &Style,width: usize)->String{
     let (horizontal, _vertical) = style.get_parts();
@@ -194,6 +202,7 @@ fn horizontal_line(style: &Style,width: usize)->String{
         buf.push_str("\n");
         buf
 }
+
 
 pub struct Parts {
     title: Title,
@@ -421,6 +430,7 @@ impl  LineFormat for Title {
 struct Info{
     content:Vec<Line>
 }
+/// Options are really a numbered list numbered from 0 and up
 struct Options{
     content:Vec<Line>
 }
@@ -470,11 +480,16 @@ impl From<&[&str]> for Options {
         Options{ content: x.iter().enumerate().map(|(i,f)| -> Line {format!("{} {}",i,f).as_str().into()}).collect() }
     }
 }
+
+
 impl Options {
     fn new()->Self{
         Options { content: Vec::new() }
     }
-
+    ///replace a single option in the list
+    fn replace_line(&mut self, idx:usize, option: &str){
+        self.content[idx] = Line::new( &format!("{} {}",idx,option));
+    }
     fn format(&self,placement: &Placement, style: &Style, width: usize) -> Vec<String> {
         self.content.iter().map(|s| {s.format(placement, style, width)}).collect::<Vec<_>>()
     }
@@ -524,10 +539,10 @@ fn parts_test(){
     
     let home = disp.add_page(temp);
     
-    /* loop{
+    loop{
         match disp.show(){
             
-            Response::Alt(x) => {let t = Page::build_parts(&format!("this is page {}",x));disp.add_page(t);},
+            Response::Alt(x) => {let t = Page::build_page(&disp,&format!("this is page {}",x));disp.add_page(t);},
             Response::Exit => break,
             Response::Back => disp.back(),
             Response::Page(x)=>disp.set_page(x),
@@ -535,7 +550,7 @@ fn parts_test(){
             Response::Commands(_) => todo!(),
             _=>()
         }; 
-    } */
+    }
     
     
 

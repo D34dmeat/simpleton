@@ -6,15 +6,14 @@ fn main(){
     let mut my_display = Display::new();
 
     build_pages( &mut my_display);
+    
     loop {
         break; // break to avoid errors in testing, remove this to run example
         match my_display.show() {
             Response::Page(x) => my_display.set_page(x),
-            Response::Alt(x) => {println!("Response Alt is {} ",x);break},
+            Response::Alt(x) => {println!("Response Alternative is {} ",x);break},
             Response::Exit => break,
             Response::Back => (),
-            Response::New(_, _, _, _, _) => todo!(),
-            Response::NewInfo(_, _, _, _) => todo!(),
             Response::Home => (),
             Response::Commands(x) if x[0] == "Page" => if let Ok(num) = x[1].parse::<usize>(){my_display.set_page(num)},
             Response::Commands(x) => {println!("commands {:?}",x);break},
@@ -23,6 +22,7 @@ fn main(){
     
                 
             },
+            _=>()
         }
     }
     

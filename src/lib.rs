@@ -13,7 +13,7 @@ pub use display::{Display,Page,Response,Action,DefaultAction};
 #[cfg(test)]
 mod tests {
     
-    #[test]
+    //#[test]
     fn it_works() {
         use crate::display::*;
         let (width,height) = (90,20);
@@ -22,6 +22,7 @@ mod tests {
         let my_page_index = my_display.add_page(my_page);
         my_display.set_width(width);
         my_display.set_height(height);
+        println!("{:?}",my_display.show());
                 
         assert_eq!(my_display.get_page(my_page_index).get_title(), "hello".to_string());
     }
